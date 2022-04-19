@@ -20,10 +20,13 @@ class Point:
         return self
 
     def __repr__(self):
-        return "Point({}, {}, {}".format(self.x, self.y, self.type)
+        return "Point({}, {}, {})".format(self.x, self.y, self.type)
 
     def coords(self):
         return array([self.x,self.y])
+
+    def __eq__(self, other) -> bool:
+        return (self.x == other.x) and (self.y == other.y) and (self.type == other.type)
 
 
 def distance(a, b):

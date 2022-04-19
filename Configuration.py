@@ -1,4 +1,4 @@
-from Point import Point
+from Point import Point, PointType
 from CCOA import CCOA
 from Rectangle import Rect
 
@@ -16,8 +16,30 @@ class Configuration:
 
     def place_rect(self, rect: CCOA):
         self.packed_rects.append(rect)
-        #rect.origin.type
-        self.possible_origins.remove(rect.origin)
+
+        # Remove the origin point
+        for o in self.possible_origins:
+            if rect.origin == o:
+                self.possible_origins.remove(o)
+                break
+
+        bottom_left = rect.vertices[0]
+        bottom_right = rect.vertices[1]
+        top_left = rect.vertices[2]
+        top_right = rect.vertices[3]
+        # Add the new points
+        if rect.origin.type == PointType.BOTTOM_LEFT:
+            self.possible_origins.append(top_left)
+            self.possible_origins.append(bottom_right)
+        elif rect.origin.type == PointType.BOTTOM_RIGHT:
+            self.possible_origins.append(bottom_left)
+            self.possible_origins.append(top_right)
+        elif rect.origin.type == PointType.TOP_LEFT:
+            self.possible_origins.append(top_right)
+            self.possible_origins.append(bottom_left)
+        elif rect.origin.type == PointType.TOP_RIGHT:
+            self.possible_origins.append(top_left)
+            self.possible_origins.append(bottom_right)
 
     # def set_possible_actions(self, points: list[Point]) -> None:
     #     self.possible_actions = points

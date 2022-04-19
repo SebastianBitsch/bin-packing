@@ -1,7 +1,4 @@
 from copy import copy
-from operator import le
-from tkinter.tix import ButtonBox
-from tty import CC
 from Point import Point, PointType, distance
 from Rectangle import Rect
 import numpy as np
@@ -9,11 +6,22 @@ import numpy as np
 class CCOA:
     def __init__(self, rect: Rect, origin: Point, rotated: bool, container:Rect) -> None:
         self.rect = rect
-        self.origin = origin
         self.rotated = rotated
         self.container = container
+
         if rotated:
             rect.rotate()
+
+        self.origin = origin
+        if origin.type == PointType.BOTTOM_LEFT:
+            pass
+        elif origin.type == PointType.BOTTOM_RIGHT:
+            self.origin.shift(-self.rect.width,0)
+        elif origin.type == PointType.TOP_LEFT:
+            self.origin.shift(0, -self.rect.height)
+        elif origin.type == PointType.TOP_RIGHT:
+            self.origin.shift(-self.rect.width, -self.rect.height)
+
 
     def vertices(self):
         o = self.origin
@@ -25,19 +33,30 @@ class CCOA:
         ]
 
     def bordering_boxes(self) -> list[Rect]:
+        boxes = []
         top = CCOA(Rect(-1,self.container.width, 1), Point(0, self.container.height,None), False, self.container)
         bottom = CCOA(Rect(-1,self.container.width, 1), Point(0, -1,None), False, self.container)
         left = CCOA(Rect(-1, 1, self.container.height), Point(-1, 0,None), False, self.container)
         right = CCOA(Rect(-1, 1, self.container.height), Point(self.container.width, 0,None), False, self.container)
-        boxes = []
-        if self.origin.x != 0:
-            boxes.append(left)
-        if self.origin.y != 0:
-            boxes.append(bottom)
-        if self.origin.x + self.rect.width != self.container.width:
-            boxes.append(right)
-        if self.origin.y + self.rect.height != self.container.height:
-            boxes.append(top)
+        # if self.origin.x != 0:
+        #     boxes.append(bottom)
+        # if self.origin.y != 0:
+        #     boxes.append(left)
+        # if self.origin.y + self.rect.height != top.origin:
+        #     boxes.append(top)
+        # if self.origin.x + self.rect.width != right.origin:
+        #     boxes.append(right)
+        
+        # return boxes
+        
+        # if self.origin.x != 0:
+        #     boxes.append(left)
+        # if self.origin.y != 0:
+        #     boxes.append(bottom)
+        # if self.origin.x + self.rect.width != self.container.width:
+        #     boxes.append(right)
+        # if self.origin.y + self.rect.height != self.container.height:
+        #     boxes.append(top)
         return [top,bottom,left,right]
 
     def degree(self, M):
