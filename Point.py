@@ -1,6 +1,5 @@
-from enum import Enum
 from math import sqrt
-from numpy import array
+from enum import Enum
 
 class PointType(Enum):
     BOTTOM_LEFT = 0
@@ -9,25 +8,21 @@ class PointType(Enum):
     TOP_RIGHT = 3
 
 class Point:
-    def __init__(self,x_init,y_init, type: PointType):
-        self.x = x_init
-        self.y = y_init
-        self.type = type
+    def __init__(self, x, y) -> None:
+        self.x = x
+        self.y = y
 
-    def shift(self, x, y):
-        self.x += x
-        self.y += y
-        return self
+    def tuple(self) -> tuple[int,int]:
+        return (self.x,self.y)
+
+    def __eq__(self, other):
+        return (self.x == other.x and self.y == other.y)
 
     def __repr__(self):
-        return "Point({}, {}, {})".format(self.x, self.y, self.type)
+        return "P = ({}, {})".format(self.x, self.y)
 
-    def coords(self):
-        return array([self.x,self.y])
-
-    def __eq__(self, other) -> bool:
-        return (self.x == other.x) and (self.y == other.y) and (self.type == other.type)
-
-
-def distance(a, b):
-    return sqrt((a.x-b.x)**2+(a.y-b.y)**2)
+    def distance(self, point):
+        """
+        Calculate distance to another point
+        """
+        return sqrt((self.x-point.x)**2+(self.y-point.y)**2)
