@@ -1,5 +1,5 @@
+from copy import copy
 from operator import itemgetter
-import matplotlib.pyplot as plt
 
 from Point import Point, PointType
 from Rect import Rect
@@ -29,75 +29,99 @@ def degree(i:Rect, M:list[Rect]) -> float:
 
 
 def A0(C: Configuration, L: list[Rect]):
-    degrees = []
     
     # Calculate the degrees
-    for ccoa in L:
-        d = degree(ccoa, C.packed_rects)
-        degrees.append((d, ccoa))
+    degrees = [(degree(ccoa, C.packed_rects), ccoa) for ccoa in L]
 
     # Select the CCOA with the highest degree
-    _, best_rect = max(degrees,key=itemgetter(0))
+    best_rect = max(degrees,key=itemgetter(0))[1]
+
+    # Place the rect
     C.place_rect(best_rect)
 
+    # Update L
+    L = generate_possible_actions(C)
+
+    return C, L
+
+def benefitA1(rect: Rect, C: Configuration, L: list[Rect]):
+    dC, dL = copy(C), copy(L)
+    dC.place_rect(rect)
+    dL = generate_possible_actions(dC)
+    dC, dL = A0(dC, dL)
+
+    if len(dC.remaining_rect_dims) == 0:
+        return 1 # Successful
+    else:
+        return (dC.density(), rect)
+
+def A1(C):
+
+    # Generate all possible actions
+    L = generate_possible_actions(C)
+
+    while 0 < len(L):
+        max_benefit = []
+        for ccoa in L:
+            d = benefitA1(ccoa, C, L)
+            if d == 1:
+                print("success")
+                return
+            else:
+                max_benefit.append(d)
+        
+        # Select the Configuration with the highest degree
+        best_rect = max(d,key=itemgetter(0))[1]
+        C.place_rect(best_rect)
+        L = generate_possible_actions(C)
+        for l in L:
+            print(l)
+
+
+
+def generate_possible_actions(C: Configuration) -> list[Rect]:
+    L = []
+    for d in C.remaining_rect_dims:
+        w,h = d
+        origins = C.valid_origins_for_rect(Rect(Point(), w, h))
+        rects = [Rect(o, w, h) for o in origins]
+        L.extend(rects)
+    return L
 
 if __name__ == "__main__":
-    # all_rects = [(1,2)]
-    # C = Configuration(packed_rects=[Rect(Point(0,0),2,2)])
 
-    # L = [
-    #     Rect(Point(0,2),1,2),
-    #     Rect(Point(2,0),1,2),
-    #     Rect(Point(0,3),1,2),
-    #     Rect(Point(4,0),1,2),
-    #     Rect(Point(4,3),1,2),
-    #     Rect(Point(0,2),1,2,True),
-    #     Rect(Point(2,0),1,2,True),
-    #     Rect(Point(0,4),1,2,True),
-    #     Rect(Point(3,0),1,2,True),
-    #     Rect(Point(3,4),1,2,True)
-    # ]
-    
-    points = [
+    dims = [(1,1),(3,3),(2,2)]
+
+    initial_points = [
         (Point(0,0), PointType.BOTTOM_LEFT),
         (Point(container_width,0), PointType.BOTTOM_RIGHT),
         (Point(0,container_height), PointType.TOP_LEFT),
         (Point(container_width, container_height), PointType.TOP_RIGHT)
     ]
 
-    C = Configuration(packed_rects=[], possible_points=points, container_width=container_width, container_height=container_height)
+    C = Configuration(packed_rects=[], concave_corners=initial_points, remaining_rect_dims=dims, container_width=container_width, container_height=container_height)
 
-    # Generate all possible actions
-    L = []
-    dims = [(1,2)]
-    for d in dims:
-        x,y = d
-        
-    # L = [
-    #     Rect(Point(0,0),1,2),
-    #     Rect(Point(0,3),1,2),
-    #     Rect(Point(4,1),1,2),
-    #     Rect(Point(4,3),1,2),
+    A1(C)
+    # dims = [(1,1),(2,2)]
+
+    # initial_points = [
+    #     (Point(0,0), PointType.BOTTOM_LEFT),
+    #     (Point(container_width,0), PointType.BOTTOM_RIGHT),
+    #     (Point(0,container_height), PointType.TOP_LEFT),
+    #     (Point(container_width, container_height), PointType.TOP_RIGHT)
     # ]
 
-    # C = Configuration(packed_rects=L, container_width=container_width, container_height=container_height)
+    # C = Configuration(packed_rects=[], concave_corners=initial_points, remaining_rect_dims=dims, container_width=container_width, container_height=container_height)
 
-    # L = [
-    #     Rect(Point(0,0),1,2),
-    #     Rect(Point(0,3),1,2),
-    #     Rect(Point(4,0),1,2),
-    #     Rect(Point(4,3),1,2),
-    #     Rect(Point(0,0),1,2,True),
-    #     Rect(Point(0,4),1,2,True),
-    #     Rect(Point(3,0),1,2,True),
-    #     Rect(Point(3,4),1,2,True)
-    # ]
-    # a = Rect(Point(0,0),2,2)
-    # b = Rect(Point(2,0),1,1)
-    # print(a.min_distance(b))
+    # # Generate all possible actions
+    # L = generate_possible_actions(C)
+    # for l in L:
+    #     print(l)
+    # print("---")
+    # # fig, ax = draw_configuration(C)
+    # # plt.show()
 
-    fig, ax = draw_configuration(C)
-    
-    plt.show()
 
-    A0(C, L)
+    # C, L = A0(C, L)
+
+

@@ -17,6 +17,12 @@ class Rect:
         self.height = height
         self.rotated = rotated
 
+    def area(self) -> int:
+        return self.width * self.height
+
+    def corners(self) -> list[Point]:
+        return [p for p in self]
+
     @property
     def bottom(self):
         """

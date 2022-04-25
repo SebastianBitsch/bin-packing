@@ -1,3 +1,4 @@
+from functools import total_ordering
 from math import sqrt
 from enum import Enum
 
@@ -7,10 +8,19 @@ class PointType(Enum):
     TOP_LEFT = 2
     TOP_RIGHT = 3
 
+@total_ordering
 class Point:
-    def __init__(self, x, y) -> None:
+    def __init__(self, x=0, y=0) -> None:
         self.x = x
         self.y = y
+
+    def move(self, amount):
+        self.x += amount[0]
+        self.y += amount[1]
+
+    def shift(self, dx, dy):
+        self.x += dx
+        self.y += dy
 
     def tuple(self) -> tuple[int,int]:
         return (self.x,self.y)
@@ -20,6 +30,15 @@ class Point:
 
     def __repr__(self):
         return "P = ({}, {})".format(self.x, self.y)
+
+    def __lt__(self, other):
+        '''
+        Return the point which is closest to (0,0)
+        '''
+        return self.distance(Point()) < other.distance(Point())
+    
+    def __hash__(self):
+        return hash(str(self))
 
     def distance(self, point):
         """
