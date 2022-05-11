@@ -17,6 +17,7 @@ class Point:
     def move(self, amount):
         self.x += amount[0]
         self.y += amount[1]
+        return self
 
     def shift(self, dx, dy):
         self.x += dx

@@ -90,7 +90,7 @@ def generate_possible_actions(C: Configuration) -> list[Rect]:
 
 if __name__ == "__main__":
 
-    dims = [(1,1),(3,3),(2,2)]
+    dims = [(1,1)]
 
     initial_points = [
         (Point(0,0), PointType.BOTTOM_LEFT),

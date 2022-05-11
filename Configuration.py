@@ -1,5 +1,4 @@
 from copy import copy
-import re
 from Point import Point, PointType
 from Rect import Rect
 
@@ -19,6 +18,9 @@ class Configuration:
         return occupied_area/total_area
 
     def rect_placement_valid(self, rect: Rect) -> bool:
+        """
+        Returns true if the input rect doesnt overlap any of the rects in the configuration
+        """
         return all([rect.overlaps(x) for x in self.packed_rects])
 
 
