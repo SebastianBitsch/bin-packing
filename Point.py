@@ -1,5 +1,4 @@
 from functools import total_ordering
-from math import sqrt
 from enum import Enum
 
 class PointType(Enum):
@@ -13,18 +12,6 @@ class Point:
     def __init__(self, x=0, y=0) -> None:
         self.x = x
         self.y = y
-
-    def move(self, amount):
-        self.x += amount[0]
-        self.y += amount[1]
-        return self
-
-    def shift(self, dx, dy):
-        self.x += dx
-        self.y += dy
-
-    def tuple(self) -> tuple[int,int]:
-        return (self.x,self.y)
 
     def __eq__(self, other):
         return (self.x == other.x and self.y == other.y)
@@ -40,9 +27,3 @@ class Point:
     
     def __hash__(self):
         return hash(str(self))
-
-    def distance(self, point):
-        """
-        Calculate distance to another point
-        """
-        return sqrt((self.x-point.x)**2+(self.y-point.y)**2)

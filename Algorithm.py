@@ -1,111 +1,29 @@
-from copy import copy, deepcopy
+from copy import deepcopy
 from Point import Point, PointType
 from Rect import Rect
 from Configuration1 import Configuration
 from plotting import draw_configuration
 import matplotlib.pyplot as plt
+import tests 
+
+import cProfile
+
 
 eps = 0.001
-cat1_p1 = [
-    (2,12),
-    (7,12),
-    (8,6),
-    (3,6),
-    (3,5),
-    (5,5),
-    (3,12),
-    (3,7),
-    (5,7),
-    (2,6),
-    (3,2),
-    (4,2),
-    (3,4),
-    (4,4),
-    (9,2),
-    (11,2)
-]
-cat1_p2 = [
-    (4,1),
-    (4,5),
-    (9,4),
-    (3,5),
-    (3,9),
-    (1,4),
-    (5,3),
-    (4,1),
-    (5,5),
-    (7,2),
-    (9,3),
-    (3,13),
-    (2,8),
-    (15,4),
-    (5,4),
-    (10,6),
-    (7,2)
-]
-cat1_p3 = [
-    (4,14),
-    (5,2),
-    (2,2),
-    (9,7),
-    (5,5),
-    (2,5),
-    (7,7),
-    (3,5),
-    (6,5),
-    (3,2),
-    (6,2),
-    (4,6),
-    (6,3),
-    (10,3),
-    (6,3),
-    (6,3),
-    (10,3)
-]
 
-cat3_p1 = [
-    (7,5),
-    (14,5),
-    (14,8),
-    (4,8),
-    (21,13),
-    (7,11),
-    (14,11),
-    (14,5),
-    (4,5),
-    (18,3),
-    (21,3),
-    (17,11),
-    (4,11),
-    (7,4),
-    (5,4),
-    (6,7),
-    (18,5),
-    (3,5),
-    (7,3),
-    (5,3),
-    (18,4),
-    (3,4),
-    (12,2),
-    (6,2),
-    (18,5),
-    (21,5),
-    (17,3),
-    (4,3)
-]
-
-def generate_L(C: Configuration, remaining_rects: list[tuple]):
+def generate_L(C: Configuration, remaining_rects: list[tuple]) -> list[Rect]:
     # 1. concave corners
     concave_corners = get_concave_corners(C)
 
     # 2. generate ccoas for every rect
-    ccoas = []
+    ccoas: list[Rect] = []
     for x, y in remaining_rects:
         for corner, type in concave_corners:
-            ccoa = Rect(corner, x, y, type)
-            if not C.fits(ccoa):
-                continue
-            ccoas.append(ccoa)
+            for rotated in [False, True]:
+                ccoa = Rect(corner, x, y, type, rotated)
+                if not C.fits(ccoa):
+                    continue
+                ccoas.append(ccoa)
 
     return ccoas
 
@@ -117,10 +35,7 @@ def degree(i:Rect, C: Configuration) -> float:
     d_mins = [m.min_distance(i) for m in C.rects]
     
     # Add the distances to the borders
-    d_mins.append(i.bottom)
-    d_mins.append(i.left)
-    d_mins.append(C.size.y - i.top)
-    d_mins.append(C.size.x - i.right)
+    d_mins += [i.bottom, i.left, C.size.y - i.top, C.size.x - i.right]
 
     # Remove two smallest elements, which will be 0 - the two imediate neighbours
     assert(min(d_mins) == 0)
@@ -131,18 +46,11 @@ def degree(i:Rect, C: Configuration) -> float:
     return 1 - (min(d_mins) /((i.width + i.height)/2))
 
 
-def get_concave_corners(C: Configuration):
+def get_concave_corners(C: Configuration) -> list[tuple[Point,PointType]]:
     concave_corners: list[tuple(Point,PointType)] = []
 
-    # Check the 4 vertices of all packed rects, not the most optimal - alot of duplicate verts
-    for rect in C.rects:
-        for corner in rect:
-            corner_type = get_corner_type(C, corner)
-            if corner_type:
-                concave_corners.append((corner,corner_type))
-
-    # Check the four container corners
-    for corner in [Point(0,0), Point(0,C.size.y), Point(C.size.x,0), C.size]:
+    # Check the 4 vertices of all packed rects
+    for corner in C.get_all_corners():
         corner_type = get_corner_type(C, corner)
         if corner_type:
             concave_corners.append((corner,corner_type))
@@ -175,24 +83,28 @@ def A0(C: Configuration, L: list[Rect], rects: list[Rect]):
         best = argmax(degrees)
 
         C.place_rect(L[best])
-        rects.remove((L[best].width, L[best].height))
+        rects = remove_rect(L[best].width, L[best].height, rects)
 
         L = generate_L(C, rects)
         
     return C
+
+def remove_rect(w, h, rects) -> list[Rect]:
+    if (w,h) in rects:
+        rects.remove((w,h))
+    elif (h,w) in rects:
+        rects.remove((h,w))
+    return rects
 
 def BenefitA1(ccoa: Rect, C: Configuration, L: list[Rect], rects: list[Rect]):
     Cx = deepcopy(C)
     Lx = deepcopy(L)
     rectsx = deepcopy(rects)
 
-    # Might be wrong
     Cx.place_rect(ccoa)
-    rectsx.remove((ccoa.width,ccoa.height))
-    Lx = generate_L(Cx, rectsx)
+    rectsx = remove_rect(ccoa.width,ccoa.height, rectsx)
 
-    # if Cx.is_successful():
-    #     return Cx
+    Lx = generate_L(Cx, rectsx)
 
     Cx = A0(Cx, Lx, rectsx)
 
@@ -213,6 +125,7 @@ def A1(container_size: Point, rects: list[Rect]):
         for ccoa in L:
             d = BenefitA1(ccoa, C, L, rects)
             if type(d) is Configuration:
+                print("Found successful configuration")
                 return d
             else:
                 if max_benefit < d:
@@ -220,30 +133,29 @@ def A1(container_size: Point, rects: list[Rect]):
                     max_benefit_ccoa = ccoa
         
 
+        print(f"Placed {max_benefit_ccoa}, {len(rects)} rects remaining")
         C.place_rect(max_benefit_ccoa)
-        rects.remove((max_benefit_ccoa.width, max_benefit_ccoa.height))
+        rects = remove_rect(max_benefit_ccoa.width, max_benefit_ccoa.height, rects)
+        
         L = generate_L(C, rects)
 
-        corners = get_concave_corners(C)
-        corners = [x[0] for x in corners]
-        _, _ = draw_configuration(C,corners)
-        print(rects)
-        plt.show()
+        # corners = get_concave_corners(C)
+        # corners = [x[0] for x in corners]
+        # _, _ = draw_configuration(C,corners)
+        # print(rects)
+        # plt.show()
 
-    return None
-
+    print("Stopped with failure")
+    print(f"Rects remaining: {rects}")
+    return C
 
 
 if __name__ == "__main__":
-    size = Point(60,30)
+    size = Point(20,20)
 
-    C = A1(container_size = size, rects = cat3_p1)
+    cProfile.run('C = A1(container_size = size, rects = tests.cat1_p1)',sort="time")
+    # C = A1(container_size = size, rects = tests.cat1_p1)
 
-    if C:
-        print("Found successful configuration")
-        
-        _, _ = draw_configuration(C)
-        plt.show()
-    else:
-        print("Stopped with failure")
+    _, _ = draw_configuration(C)
+    plt.show()
 

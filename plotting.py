@@ -27,5 +27,5 @@ def draw_points(ax, corners: list[Point], color='red', marker='x'):
 
 
 def draw_rect(ax, rect:Rect, background_color, edge_color, alpha):
-    box = Rectangle(rect.origin.tuple(), rect.width, rect.height, fc=background_color,ec=edge_color,alpha=alpha)
+    box = Rectangle((rect.origin.x,rect.origin.y), rect.width, rect.height, fc=background_color,ec=edge_color,alpha=alpha)
     ax.add_patch(box)
