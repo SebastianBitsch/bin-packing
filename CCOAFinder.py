@@ -1,6 +1,6 @@
 from Point import Point, PointType
 from Rect import Rect
-from Configuration import Configuration
+from old.Configuration import Configuration
 import matplotlib.pyplot as plt
 
 from plotting import draw_configuration

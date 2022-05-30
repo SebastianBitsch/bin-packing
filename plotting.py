@@ -3,7 +3,7 @@ import numpy as np
 from Point import Point
 
 from Rect import Rect
-from Configuration import Configuration
+from old.Configuration import Configuration
 from matplotlib.patches import Rectangle
 
 def draw_configuration(configuration:Configuration, background_color='lightblue', edge_color='black',alpha=0.5):

@@ -5,12 +5,12 @@ class Rect:
 
     def __init__(self, origin: Point, width, height, rotated:bool = False) -> None:
         
+        assert(0 < width and 0 < height)
+
         if rotated:
             temp = height
             height = width
             width = temp
-
-        assert(0 < width and 0 < height)
 
         self.origin = origin
         self.width = width
@@ -19,9 +19,6 @@ class Rect:
 
     def area(self) -> int:
         return self.width * self.height
-
-    def corners(self) -> list[Point]:
-        return [p for p in self]
 
     @property
     def bottom(self):
