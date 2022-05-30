@@ -4,14 +4,40 @@ from Rect import Rect
 from Configuration1 import Configuration
 from plotting import draw_configuration
 import matplotlib.pyplot as plt
-import tests 
+import TestCases 
 
 import cProfile
 
-
 eps = 0.001
 
+
+frame_time = 0.02
+test_set = deepcopy(TestCases.cat1_p3)
+
+
+def plot(C: Configuration, rects: list = [], waittime: float = 0.0):
+    """
+    Helper function for passing the configuration to the plotter for plotting/animation
+    """
+    _, _ = draw_configuration(C, test_set, rects)
+    plt.show(block=False)
+    plt.pause(frame_time + waittime)
+    plt.close()
+
+
 def generate_L(C: Configuration, remaining_rects: list[tuple]) -> list[Rect]:
+    """
+    A function that takes the current configuration, all the remaining rects and returns all
+    possible CCOAs that can be fitted to the configuration
+
+    Parameters
+    ----------
+    C: Configuration, required
+        The current configuration
+    
+    remaining_rects: list[tuple], required:
+        The dimensions of the rects yet to be packed. On the format: (w,h)
+    """
     # 1. concave corners
     concave_corners = get_concave_corners(C)
 
@@ -21,6 +47,8 @@ def generate_L(C: Configuration, remaining_rects: list[tuple]) -> list[Rect]:
         for corner, type in concave_corners:
             for rotated in [False, True]:
                 ccoa = Rect(corner, x, y, type, rotated)
+
+                # 3. Add if it fits
                 if not C.fits(ccoa):
                     continue
                 ccoas.append(ccoa)
@@ -32,6 +60,10 @@ def argmax(lst):
     return lst.index(max(lst))
 
 def degree(i:Rect, C: Configuration) -> float:
+    """
+    
+    """
+
     d_mins = [i.min_distance(m) for m in C.rects]
     
     # Add the distances to the borders
@@ -75,7 +107,7 @@ def check_boundaries(C: Configuration, p: Point):
 
 
 def A0(C: Configuration, L: list[Rect], rects: list[Rect]):
-
+    
     while 0 < len(L):
 
         degrees = [degree(ccoa, C) for ccoa in L]
@@ -83,25 +115,24 @@ def A0(C: Configuration, L: list[Rect], rects: list[Rect]):
 
         C.place_rect(L[best])
         rects = remove_rect(L[best].width, L[best].height, rects)
-
         L = generate_L(C, rects)
-        
+
+        plot(C, rects)
+
     return C
 
-def remove_rect(w, h, rects) -> list[Rect]:
-    if (w,h) in rects:
-        rects.remove((w,h))
-    elif (h,w) in rects:
-        rects.remove((h,w))
-    return rects
+def remove_rect(w, h, r) -> list[Rect]:
+    if (w,h) in r:
+        r.remove((w,h))
+    elif (h,w) in r:
+        r.remove((h,w))
+    return r
 
-def BenefitA1(ccoa: Rect, C: Configuration, L: list[Rect], rects: list[Rect]):
-    Cx = deepcopy(C)
-    Lx = deepcopy(L)
-    rectsx = deepcopy(rects)
+def BenefitA1(ccoa: Rect, Cx: Configuration, Lx: list[Rect], rectsx: list[Rect]):
 
     Cx.place_rect(ccoa)
     rectsx = remove_rect(ccoa.width,ccoa.height, rectsx)
+    plot(Cx, rectsx)
 
     Lx = generate_L(Cx, rectsx)
 
@@ -122,7 +153,7 @@ def A1(container_size: Point, rects: list[Rect]):
         max_benefit_ccoa = None
 
         for ccoa in L:
-            d = BenefitA1(ccoa, C, L, rects)
+            d = BenefitA1(ccoa, deepcopy(C), deepcopy(L), deepcopy(rects))
             if type(d) is Configuration:
                 print("Found successful configuration")
                 return d
@@ -130,19 +161,13 @@ def A1(container_size: Point, rects: list[Rect]):
                 if max_benefit < d:
                     max_benefit = d
                     max_benefit_ccoa = ccoa
-        
 
         print(f"Placed {max_benefit_ccoa}, {len(rects)} rects remaining")
         C.place_rect(max_benefit_ccoa)
         rects = remove_rect(max_benefit_ccoa.width, max_benefit_ccoa.height, rects)
         
         L = generate_L(C, rects)
-
-        # corners = get_concave_corners(C)
-        # corners = [x[0] for x in corners]
-        # _, _ = draw_configuration(C,corners)
-        # print(rects)
-        # plt.show()
+        plot(C,rects)
 
     print("Stopped with failure")
     print(f"Rects remaining: {rects}")
@@ -152,9 +177,11 @@ def A1(container_size: Point, rects: list[Rect]):
 if __name__ == "__main__":
     size = Point(20,20)
 
-    cProfile.run('C = A1(container_size = size, rects = tests.cat1_p1)', sort="time")
-    # C = A1(container_size = size, rects = tests.cat1_p1)
+    C = Configuration(size=size, max_rects=TestCases.cat1_p3)
+    plot(C, waittime=4)
 
-    _, _ = draw_configuration(C, tests.cat1_p1)
-    plt.show()
+    # cProfile.run('C = A1(container_size = size, rects = tests.cat1_p1)', sort="time")
+    C = A1(container_size = size, rects = TestCases.cat1_p3)
+
+    plot(C, waittime=20)
 
