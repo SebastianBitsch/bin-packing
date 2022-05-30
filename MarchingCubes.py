@@ -17,10 +17,6 @@ def flatten(t):
 def example_usage() -> None:
     container_size = 10
     rects = [
-        # Rect(Point(0,0),2,2),
-        # Rect(Point(container_size-2,0),2,2),
-        # Rect(Point(0,container_size-2),2,2),
-        # Rect(Point(container_size-2, container_size-2),2,2)
         Rect(Point(0,0),2,2),
         Rect(Point(1,2),1,1),
         Rect(Point(2,1),1,3),
@@ -28,8 +24,8 @@ def example_usage() -> None:
         Rect(Point(5,0),1,9),
         Rect(Point(6,0),3,3),
         Rect(Point(2,0),3,1),
-        Rect(Point(0,2),1,5)
-        
+        Rect(Point(0,2),1,5),
+        # Rect(Point(9,8),1,2),
     ]
 
     concave_corners = get_free_corners(container_size, rects)
@@ -43,14 +39,16 @@ def example_usage() -> None:
 def get_free_corners(container_size: int, rects: list[Rect]) -> list[Point]:
     """
     """
-    edge_points = get_outside_corners(container_size, rects)
+    starting_point = Point(0,0)
+
+    edge_points = get_outside_corners(container_size, rects, starting_point)
     concave_corners = get_concave_corners(container_size, edge_points)
     concave_corners_w_corners = add_free_corner_points(container_size, concave_corners)
 
     return concave_corners_w_corners
 
 
-def get_outside_corners(container_size: int, rects: list[Rect]) -> list[Point]:
+def get_outside_corners(container_size: int, rects: list[Rect], starting_point) -> list[Point]:
     '''
     A function that takes a list of rects that allign in the way outlined in the bin packing problem
     and returns a list of all the concave corners in polygon given as points 
@@ -65,7 +63,6 @@ def get_outside_corners(container_size: int, rects: list[Rect]) -> list[Point]:
     '''
 
     # Start at the point that is closest to (0,0)
-    starting_point = min([rect.origin for rect in rects])
     current_point = copy(starting_point)
 
     all_points = list(set(flatten([x.corners() for x in rects])))

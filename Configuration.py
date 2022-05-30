@@ -17,6 +17,14 @@ class Configuration:
         occupied_area = sum([x.area() for x in self.packed_rects])
         return occupied_area/total_area
 
+    def contains(self, point:Point) -> bool:
+        if point.x <= 0 or point.y <= 0 or self.container_width <= point.x or self.container_height <= point.y:
+            return True
+        for p in self.packed_rects:
+            if p.contains(point):
+                return True
+        return False
+
     def rect_placement_valid(self, rect: Rect) -> bool:
         """
         Returns true if the input rect doesnt overlap any of the rects in the configuration

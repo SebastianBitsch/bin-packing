@@ -70,6 +70,10 @@ class Rect:
     def move(self, point):
         self.origin = point
 
+    # TODO: Mistakenly returns true for negative points
+    def contains(self, point: Point) -> bool:
+        return self.corner_bot_l.x <= point.x and self.corner_bot_l.y <= point.y and point.x <= self.corner_top_r.x and point.y <= self.corner_top_r.y
+
     def rotate(self):
         temp = self.width
         self.width = self.height
