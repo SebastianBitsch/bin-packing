@@ -32,7 +32,7 @@ def argmax(lst):
     return lst.index(max(lst))
 
 def degree(i:Rect, C: Configuration) -> float:
-    d_mins = [m.min_distance(i) for m in C.rects]
+    d_mins = [i.min_distance(m) for m in C.rects]
     
     # Add the distances to the borders
     d_mins += [i.bottom, i.left, C.size.y - i.top, C.size.x - i.right]
@@ -49,7 +49,6 @@ def degree(i:Rect, C: Configuration) -> float:
 def get_concave_corners(C: Configuration) -> list[tuple[Point,PointType]]:
     concave_corners: list[tuple(Point,PointType)] = []
 
-    # Check the 4 vertices of all packed rects
     for corner in C.get_all_corners():
         corner_type = get_corner_type(C, corner)
         if corner_type:
@@ -153,9 +152,9 @@ def A1(container_size: Point, rects: list[Rect]):
 if __name__ == "__main__":
     size = Point(20,20)
 
-    cProfile.run('C = A1(container_size = size, rects = tests.cat1_p1)',sort="time")
+    cProfile.run('C = A1(container_size = size, rects = tests.cat1_p1)', sort="time")
     # C = A1(container_size = size, rects = tests.cat1_p1)
 
-    _, _ = draw_configuration(C)
+    _, _ = draw_configuration(C, tests.cat1_p1)
     plt.show()
 

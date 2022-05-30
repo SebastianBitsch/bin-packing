@@ -7,6 +7,7 @@ class PointType(Enum):
     TOP_LEFT = 2
     TOP_RIGHT = 3
 
+# TODO: Factor out the class, really not neccessary - and alot of points are instantiated through the course of solving
 @total_ordering
 class Point:
     def __init__(self, x=0, y=0) -> None:
