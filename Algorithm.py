@@ -1,5 +1,4 @@
-from cmath import rect
-from copy import copy
+from copy import copy, deepcopy
 from Point import Point, PointType
 from Rect import Rect
 from Configuration1 import Configuration
@@ -7,7 +6,93 @@ from plotting import draw_configuration
 import matplotlib.pyplot as plt
 
 eps = 0.001
+cat1_p1 = [
+    (2,12),
+    (7,12),
+    (8,6),
+    (3,6),
+    (3,5),
+    (5,5),
+    (3,12),
+    (3,7),
+    (5,7),
+    (2,6),
+    (3,2),
+    (4,2),
+    (3,4),
+    (4,4),
+    (9,2),
+    (11,2)
+]
+cat1_p2 = [
+    (4,1),
+    (4,5),
+    (9,4),
+    (3,5),
+    (3,9),
+    (1,4),
+    (5,3),
+    (4,1),
+    (5,5),
+    (7,2),
+    (9,3),
+    (3,13),
+    (2,8),
+    (15,4),
+    (5,4),
+    (10,6),
+    (7,2)
+]
+cat1_p3 = [
+    (4,14),
+    (5,2),
+    (2,2),
+    (9,7),
+    (5,5),
+    (2,5),
+    (7,7),
+    (3,5),
+    (6,5),
+    (3,2),
+    (6,2),
+    (4,6),
+    (6,3),
+    (10,3),
+    (6,3),
+    (6,3),
+    (10,3)
+]
 
+cat3_p1 = [
+    (7,5),
+    (14,5),
+    (14,8),
+    (4,8),
+    (21,13),
+    (7,11),
+    (14,11),
+    (14,5),
+    (4,5),
+    (18,3),
+    (21,3),
+    (17,11),
+    (4,11),
+    (7,4),
+    (5,4),
+    (6,7),
+    (18,5),
+    (3,5),
+    (7,3),
+    (5,3),
+    (18,4),
+    (3,4),
+    (12,2),
+    (6,2),
+    (18,5),
+    (21,5),
+    (17,3),
+    (4,3)
+]
 
 def generate_L(C: Configuration, remaining_rects: list[tuple]):
     # 1. concave corners
@@ -94,23 +179,20 @@ def A0(C: Configuration, L: list[Rect], rects: list[Rect]):
 
         L = generate_L(C, rects)
         
-        # _, _ = draw_configuration(C)
-        # plt.show()
     return C
 
 def BenefitA1(ccoa: Rect, C: Configuration, L: list[Rect], rects: list[Rect]):
-    Cx = copy(C)
-    Lx = copy(L)
-    rectsx = copy(rects)
+    Cx = deepcopy(C)
+    Lx = deepcopy(L)
+    rectsx = deepcopy(rects)
 
     # Might be wrong
     Cx.place_rect(ccoa)
     rectsx.remove((ccoa.width,ccoa.height))
     Lx = generate_L(Cx, rectsx)
-    if Cx.is_successful():
-        return Cx
-    elif len(Lx) == 0:
-        return Cx.density()
+
+    # if Cx.is_successful():
+    #     return Cx
 
     Cx = A0(Cx, Lx, rectsx)
 
@@ -131,32 +213,35 @@ def A1(container_size: Point, rects: list[Rect]):
         for ccoa in L:
             d = BenefitA1(ccoa, C, L, rects)
             if type(d) is Configuration:
-                return C
+                return d
             else:
                 if max_benefit < d:
                     max_benefit = d
                     max_benefit_ccoa = ccoa
-                # if 1.0 <= max_benefit:
-                #     return None
         
+
         C.place_rect(max_benefit_ccoa)
-        rects.remove(max_benefit_ccoa)
+        rects.remove((max_benefit_ccoa.width, max_benefit_ccoa.height))
         L = generate_L(C, rects)
+
+        corners = get_concave_corners(C)
+        corners = [x[0] for x in corners]
+        _, _ = draw_configuration(C,corners)
+        print(rects)
+        plt.show()
 
     return None
 
 
 
 if __name__ == "__main__":
-    rects = [
-        (4,1),
-        (2,2)
-    ]
+    size = Point(60,30)
 
-    C = A1(container_size = Point(5,4), rects = rects)
+    C = A1(container_size = size, rects = cat3_p1)
 
     if C:
         print("Found successful configuration")
+        
         _, _ = draw_configuration(C)
         plt.show()
     else:

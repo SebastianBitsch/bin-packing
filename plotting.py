@@ -6,17 +6,17 @@ from Rect import Rect
 from Configuration1 import Configuration
 from matplotlib.patches import Rectangle
 
-def draw_configuration(configuration:Configuration, background_color='lightblue', edge_color='black',alpha=0.5):
+def draw_configuration(configuration:Configuration, corners: list[Point] = [], background_color='lightblue', edge_color='black',alpha=0.5):
 
     fig, ax = plt.subplots(1,figsize=(6,6))
-
+    plt.locator_params(axis="both", integer=True, tight=True)
     plt.xlim([0,configuration.size.x])
     plt.ylim([0,configuration.size.y])
 
     for rect in configuration.rects:
         draw_rect(ax, rect,background_color,edge_color, alpha)
 
-    # draw_points(ax, configuration.concave_corners)
+    draw_points(ax, corners)
 
     return fig, ax
 
