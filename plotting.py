@@ -3,20 +3,20 @@ import numpy as np
 from Point import Point
 
 from Rect import Rect
-from old.Configuration import Configuration
+from Configuration1 import Configuration
 from matplotlib.patches import Rectangle
 
 def draw_configuration(configuration:Configuration, background_color='lightblue', edge_color='black',alpha=0.5):
 
     fig, ax = plt.subplots(1,figsize=(6,6))
 
-    plt.xlim([0,configuration.container_height])
-    plt.ylim([0,configuration.container_width])
+    plt.xlim([0,configuration.size.x])
+    plt.ylim([0,configuration.size.y])
 
-    for rect in configuration.packed_rects:
+    for rect in configuration.rects:
         draw_rect(ax, rect,background_color,edge_color, alpha)
 
-    draw_points(ax, configuration.concave_corners)
+    # draw_points(ax, configuration.concave_corners)
 
     return fig, ax
 

@@ -1,9 +1,9 @@
 from math import sqrt
-from Point import Point
+from Point import Point, PointType
 
 class Rect:
 
-    def __init__(self, origin: Point, width, height, rotated:bool = False) -> None:
+    def __init__(self, origin: Point, width, height, origin_type: PointType = PointType.BOTTOM_LEFT, rotated:bool = False) -> None:
         
         assert(0 < width and 0 < height)
 
@@ -12,7 +12,15 @@ class Rect:
             height = width
             width = temp
 
-        self.origin = origin
+        if origin_type == PointType.BOTTOM_LEFT:
+            self.origin = origin
+        if origin_type == PointType.TOP_LEFT:
+            self.origin = Point(origin.x, origin.y - height)
+        if origin_type == PointType.BOTTOM_RIGHT:
+            self.origin = Point(origin.x - width, origin.y)
+        if origin_type == PointType.TOP_RIGHT:
+            self.origin = Point(origin.x - width, origin.y - height)
+        
         self.width = width
         self.height = height
         self.rotated = rotated
