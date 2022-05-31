@@ -1,10 +1,10 @@
 from copy import deepcopy
 from math import sqrt
-from Point import Point, PointType
+from util import PointType
 
 class Rect:
 
-    def __init__(self, origin: Point, width, height, origin_type: PointType = PointType.BOTTOM_LEFT, rotated:bool = False) -> None:        
+    def __init__(self, origin: tuple, width, height, origin_type: PointType = PointType.BOTTOM_LEFT, rotated:bool = False) -> None:        
         assert(0 < width and 0 < height)
 
         if rotated:
@@ -16,25 +16,25 @@ class Rect:
         if origin_type == PointType.BOTTOM_LEFT:
             self.origin = origin
         if origin_type == PointType.TOP_LEFT:
-            self.origin = Point(origin.x, origin.y - height)
+            self.origin = (origin[0], origin[1] - height)
         if origin_type == PointType.BOTTOM_RIGHT:
-            self.origin = Point(origin.x - width, origin.y)
+            self.origin = (origin[0] - width, origin[1])
         if origin_type == PointType.TOP_RIGHT:
-            self.origin = Point(origin.x - width, origin.y - height)
+            self.origin = (origin[0] - width, origin[1] - height)
         
         self.width = width
         self.height = height
         self.rotated = rotated
 
-        self.bottom = self.origin.y
-        self.top = self.origin.y+self.height
-        self.left = self.origin.x
-        self.right = self.origin.x+self.width
+        self.bottom = self.origin[1]
+        self.top = self.origin[1]+self.height
+        self.left = self.origin[0]
+        self.right = self.origin[0]+self.width
 
-        self.corner_bot_l = Point(self.left, self.bottom)
-        self.corner_top_l = Point(self.left, self.top)
-        self.corner_top_r = Point(self.right, self.top)
-        self.corner_bot_r = Point(self.right, self.bottom)
+        self.corner_bot_l = (self.left, self.bottom)
+        self.corner_top_l = (self.left, self.top)
+        self.corner_top_r = (self.right, self.top)
+        self.corner_bot_r = (self.right, self.bottom)
 
 
     def __copy__(self):
@@ -58,8 +58,8 @@ class Rect:
         return self.width * self.height
 
 
-    def contains(self, point: Point) -> bool:
-        return self.corner_bot_l.x <= point.x and self.corner_bot_l.y <= point.y and point.x <= self.corner_top_r.x and point.y <= self.corner_top_r.y
+    def contains(self, point: tuple) -> bool:
+        return self.corner_bot_l[0] <= point[0] and self.corner_bot_l[1] <= point[1] and point[0] <= self.corner_top_r[0] and point[1] <= self.corner_top_r[1]
 
 
     def min_distance(self, other) -> float:
@@ -103,4 +103,4 @@ class Rect:
         yield self.corner_bot_r
 
     def __repr__(self):
-        return "R = (({}, {}), w={}, h={},r={})".format(self.origin.x, self.origin.y, self.width, self.height,self.rotated)
+        return "R = (({}, {}), w={}, h={},r={})".format(self.origin[0], self.origin[1], self.width, self.height,self.rotated)

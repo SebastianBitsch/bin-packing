@@ -15,7 +15,7 @@ class BinPacker:
         d_mins = [i.min_distance(m) for m in C.packed_rects]
         
         # Add the distances to the borders
-        d_mins += [i.bottom, i.left, C.size.y - i.top, C.size.x - i.right]
+        d_mins += [i.bottom, i.left, C.size[1] - i.top, C.size[0] - i.right]
 
         # Remove two smallest elements, which will be 0 - the two imediate neighbours
         assert(min(d_mins) == 0)
@@ -67,7 +67,10 @@ class BinPacker:
             print(f"Placed {max_benefit_ccoa}, {len(C.unpacked_rects)} rects remaining")
             C.place_rect(max_benefit_ccoa)
 
-        print("Stopped with failure")
-        print(f"Rects remaining: {C.unpacked_rects}")
+        if C.is_successful():
+            print("Found successful configuration")
+        else:
+            print("Stopped with failure")
+            print(f"Rects remaining: {C.unpacked_rects}")
         return C
 

@@ -1,15 +1,13 @@
-from copy import copy, deepcopy
+from copy import deepcopy
 from Rect import Rect
-from Point import Point, PointType
-from util import plot_configuration, initialize_plot
-import matplotlib.pyplot as plt
+from util import PointType, plot_configuration, initialize_plot
 
 class Configuration:
 
     # The amount to look in each direction when determining if a corner is concave
     eps = 0.001
 
-    def __init__(self, size: Point, unpacked_rects: list, packed_rects: list[Rect] = [], enable_plotting: bool = False) -> None:
+    def __init__(self, size: tuple, unpacked_rects: list, packed_rects: list[Rect] = [], enable_plotting: bool = False) -> None:
         self.size = size
         
         self.unpacked_rects = unpacked_rects
@@ -39,6 +37,8 @@ class Configuration:
     def enable_plotting(self):
         self.plotting = False
 
+    # TODO: Can be alot faster by taking the most recently placed rect as input - and only generating 
+    #       new ccoas for points that are contained in the new rect
     def generate_L(self):
         """
         A function that takes the current configuration, all the remaining rects and returns all
@@ -68,8 +68,8 @@ class Configuration:
 
         self.L = ccoas
 
-    def get_concave_corners(self) -> list[tuple[Point,PointType]]:
-        concave_corners: list[tuple(Point,PointType)] = []
+    def get_concave_corners(self) -> list[tuple[tuple,PointType]]:
+        concave_corners: list[tuple(tuple,PointType)] = []
 
         for corner in self.get_all_corners():
             corner_type = self.get_corner_type(corner)
@@ -78,24 +78,24 @@ class Configuration:
 
         return concave_corners
 
-    def get_corner_type(self, p: Point) -> bool:
+    def get_corner_type(self, p: tuple) -> bool:
         checks = self.check_boundaries(p)
         if sum(checks) == 3:
             index = [i for i, x in enumerate(checks) if not x][0]
             return PointType(index)
         return None
 
-    def check_boundaries(self, p: Point):
+    def check_boundaries(self, p: tuple):
         return [
-            self.contains(Point(p.x+self.eps, p.y+self.eps)),
-            self.contains(Point(p.x-self.eps, p.y+self.eps)),
-            self.contains(Point(p.x+self.eps, p.y-self.eps)),
-            self.contains(Point(p.x-self.eps, p.y-self.eps))
+            self.contains((p[0]+self.eps, p[1]+self.eps)),
+            self.contains((p[0]-self.eps, p[1]+self.eps)),
+            self.contains((p[0]+self.eps, p[1]-self.eps)),
+            self.contains((p[0]-self.eps, p[1]-self.eps))
         ]
 
-    def contains(self, point: Point) -> bool:
+    def contains(self, point: tuple) -> bool:
         # Return true if point is out of bounds
-        if point.x <= 0 or point.y <= 0 or self.size.x <= point.x or self.size.y <= point.y:
+        if point[0] <= 0 or point[1] <= 0 or self.size[0] <= point[0] or self.size[1] <= point[1]:
             return True
         
         # Check if any of the packed rects contain the point
@@ -111,7 +111,7 @@ class Configuration:
         or being out of bounds
         """
         # Check if the ccoa is out of bounds in any way
-        if ccoa.origin.x < 0 or ccoa.origin.y < 0 or self.size.x < ccoa.origin.x + ccoa.width or self.size.y < ccoa.origin.y + ccoa.height:
+        if ccoa.origin[0] < 0 or ccoa.origin[1] < 0 or self.size[0] < ccoa.origin[0] + ccoa.width or self.size[1] < ccoa.origin[1] + ccoa.height:
             return False
         
         # Check if the rect overlaps any of the already packed rects
@@ -135,24 +135,24 @@ class Configuration:
 
         # Create plot
         if self.plotting:
-            plot_configuration(self)
+            plot_configuration(self, self.is_successful())
 
 
     def density(self) -> float:
         """
         Return the percentage of total container area filled by packed rects
         """
-        total_area = self.size.x * self.size.y
+        total_area = self.size[0] * self.size[1]
         occupied_area = sum([x.area for x in self.packed_rects])
 
         return occupied_area/total_area
 
-    def get_all_corners(self) -> list[Point]:
+    def get_all_corners(self) -> list[tuple]:
         """
         Returns a set of all unique points in the container
         """
         # The container corners
-        corners = [Point(0,0), Point(0,self.size.y), Point(self.size.x,0), self.size]
+        corners = [(0,0), (0,self.size[1]), (self.size[0],0), self.size]
 
         # Get corners for every rect
         for rect in self.packed_rects:
