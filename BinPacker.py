@@ -1,12 +1,9 @@
 from copy import deepcopy
-import cProfile
 
-from Point import Point
 from Rect import Rect
-from Configuration1 import Configuration
-from util import argmax
+from Configuration import Configuration
 
-import TestCases 
+from util import argmax
 
 
 class BinPacker:
@@ -73,14 +70,4 @@ class BinPacker:
         print("Stopped with failure")
         print(f"Rects remaining: {C.unpacked_rects}")
         return C
-
-
-if __name__ == "__main__":
-    size = Point(20,20)
-
-    C = Configuration(size=size, unpacked_rects=TestCases.cat1_p1, enable_plotting=False)
-    packer = BinPacker(C)
-    
-    cProfile.run('C = packer.A1(C)', sort="time")
-    
 

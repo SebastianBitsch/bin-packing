@@ -66,20 +66,23 @@ def plot_configuration(C):
     draw_points(axs[0], C.concave_corners)
 
     # Draw secondary plot
-    draw_unplaced_rects(axs[1], all_rects, C.unpacked_rects)
+    draw_rects_overview(axs[1], all_rects, C.unpacked_rects)
     
     plt.show(block=False)
     plt.pause(frametime)
     plt.close()
 
+
 def draw_points(ax, corners: list[tuple], color='red', marker='x'):
+    """
+    Plot points given on the format [Point, Pointtype]
+    """
     x = [i[0].x for i in corners]
     y = [i[0].y for i in corners]
     ax.scatter(x, y, c=color, marker=marker)
 
 
-def draw_unplaced_rects(ax, all_rects: list, unplaced_rects: list):
-
+def draw_rects_overview(ax, all_rects: list, unplaced_rects: list):
     tallest = 0
     current_pos = Point(1,1)
 

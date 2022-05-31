@@ -1,3 +1,9 @@
+"""
+Test cases taken from the paper 
+"An empirical investigation of meta-heuristic and heuristic algorithms for a 2D packing problem"
+Ref: https://www.sciencedirect.com/science/article/abs/pii/S0377221799003574
+"""
+
 cat1_p1 = [
     (2,12),
     (7,12),
