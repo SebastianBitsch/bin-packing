@@ -1,29 +1,63 @@
+from copy import copy, deepcopy
 from Rect import Rect
 from Point import Point, PointType
+from util import plot_configuration, initialize_plot
+import matplotlib.pyplot as plt
 
 class Configuration:
 
     # The amount to look in each direction when determining if a corner is concave
     eps = 0.001
 
-    def __init__(self, size: Point, all_rects: list, packed_rects: list[Rect] = []) -> None:
+    def __init__(self, size: Point, unpacked_rects: list, packed_rects: list[Rect] = [], enable_plotting: bool = False) -> None:
         self.size = size
         
-        self.all_rects = all_rects
-        self.unpacked_rects = all_rects
+        self.unpacked_rects = unpacked_rects
         self.packed_rects = packed_rects
-
+        self.plotting = enable_plotting
+        
         self.generate_L()
 
+        if self.plotting:
+            initialize_plot(self)
+            
+
+    def __copy__(self):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        result.__dict__.update(self.__dict__)
+        return result
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
+
+    def enable_plotting(self):
+        self.plotting = False
 
     def generate_L(self):
+        """
+        A function that takes the current configuration, all the remaining rects and returns all
+        possible CCOAs that can be fitted to the configuration
+        Parameters
+        ----------
+        C: Configuration, required
+            The current configuration
+        
+        remaining_rects: list[tuple], required:
+            The dimensions of the rects yet to be packed. On the format: (w,h)
+        """
         # 1. concave corners
-        concave_corners = self.get_concave_corners()
+        self.concave_corners = self.get_concave_corners()
 
         # 2. generate ccoas for every rect
         ccoas: list[Rect] = []
         for x, y in self.unpacked_rects:
-            for corner, type in concave_corners:
+            for corner, type in self.concave_corners:
                 for rotated in [False, True]:
                     ccoa = Rect(corner, x, y, type, rotated)
 
@@ -99,12 +133,17 @@ class Configuration:
 
         self.generate_L() # TODO: Do somehing like passing the just placed rect for more efficiency
 
+        # Create plot
+        if self.plotting:
+            plot_configuration(self)
+
+
     def density(self) -> float:
         """
         Return the percentage of total container area filled by packed rects
         """
         total_area = self.size.x * self.size.y
-        occupied_area = sum([x.area() for x in self.packed_rects])
+        occupied_area = sum([x.area for x in self.packed_rects])
 
         return occupied_area/total_area
 

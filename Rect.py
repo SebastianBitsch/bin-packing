@@ -1,10 +1,10 @@
+from copy import deepcopy
 from math import sqrt
 from Point import Point, PointType
 
 class Rect:
 
-    def __init__(self, origin: Point, width, height, origin_type: PointType = PointType.BOTTOM_LEFT, rotated:bool = False) -> None:
-        
+    def __init__(self, origin: Point, width, height, origin_type: PointType = PointType.BOTTOM_LEFT, rotated:bool = False) -> None:        
         assert(0 < width and 0 < height)
 
         if rotated:
@@ -12,6 +12,7 @@ class Rect:
             height = width
             width = temp
 
+        # Shift origin to bottom left corner depending on what type of point was given
         if origin_type == PointType.BOTTOM_LEFT:
             self.origin = origin
         if origin_type == PointType.TOP_LEFT:
@@ -36,58 +37,30 @@ class Rect:
         self.corner_bot_r = Point(self.right, self.bottom)
 
 
-    def area(self) -> int:
+    def __copy__(self):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        result.__dict__.update(self.__dict__)
+        return result
+
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
+
+
+    @property
+    def area(self) -> float:
         return self.width * self.height
 
-    # @property
-    # def bottom(self):
-    #     """
-    #     Rectangle bottom edge y coordinate
-    #     """
-    #     return self.origin.y
-
-    # @property
-    # def top(self):
-    #     """
-    #     Rectangle top edge y coordiante
-    #     """
-    #     return self.origin.y+self.height
-
-    # @property
-    # def left(self):
-    #     """
-    #     Rectangle left ednge x coordinate
-    #     """
-    #     return self.origin.x
-
-    # @property
-    # def right(self):
-    #     """
-    #     Rectangle right edge x coordinate
-    #     """
-    #     return self.origin.x+self.width
-
-    # @property
-    # def corner_bot_l(self):
-    #     return Point(self.left, self.bottom)
-
-    # @property
-    # def corner_top_l(self):
-    #     return Point(self.left, self.top)
-
-    # @property
-    # def corner_top_r(self):
-    #     return Point(self.right, self.top)
-
-    # @property
-    # def corner_bot_r(self):
-    #     return Point(self.right, self.bottom)
 
     def contains(self, point: Point) -> bool:
-        """
-        Returns whether a given point is contained in the current Rect
-        """
         return self.corner_bot_l.x <= point.x and self.corner_bot_l.y <= point.y and point.x <= self.corner_top_r.x and point.y <= self.corner_top_r.y
+
 
     def min_distance(self, other) -> float:
         """
@@ -98,11 +71,6 @@ class Rect:
         outer_right = max(self.right, other.right)
         outer_bottom = min(self.bottom, other.bottom)
         outer_top = max(self.top, other.top)
-
-        # outer_left = min(self.corner_bot_l.x, other.corner_bot_l.x)
-        # outer_right = max(self.corner_bot_r.x, other.corner_bot_r.x)
-        # outer_bottom = min(self.corner_bot_l.y, other.corner_bot_l.y)
-        # outer_top = max(self.corner_top_l.y, other.corner_top_l.y)
 
         outer_width = outer_right - outer_left
         outer_height = outer_top - outer_bottom
@@ -123,11 +91,7 @@ class Rect:
         if self.top <= other.bottom or other.top <= self.bottom:
             return False
         return True
-        # if self.corner_bot_r.x <= other.corner_bot_l.x or other.corner_bot_r.x <= self.corner_bot_l.x:
-        #     return False
-        # if self.corner_top_l.y <= other.corner_bot_l.y or other.corner_top_l.y <= self.corner_bot_l.y:
-        #     return False
-        # return True
+        
 
     def __iter__(self):
         """
