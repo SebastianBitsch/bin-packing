@@ -83,18 +83,17 @@ class Rect:
     # def corner_bot_r(self):
     #     return Point(self.right, self.bottom)
 
-    def move(self, point):
-        self.origin = point
-
     def contains(self, point: Point) -> bool:
+        """
+        Returns whether a given point is contained in the current Rect
+        """
         return self.corner_bot_l.x <= point.x and self.corner_bot_l.y <= point.y and point.x <= self.corner_top_r.x and point.y <= self.corner_top_r.y
 
-    def rotate(self):
-        temp = self.width
-        self.width = self.height
-        self.height = temp
-
     def min_distance(self, other) -> float:
+        """
+        Returns the minumum distance between two Rects (AABBs), using an outer Rect method as described
+        in: https://gamedev.stackexchange.com/questions/154036/efficient-minimum-distance-between-two-axis-aligned-squares
+        """
         outer_left = min(self.left, other.left)
         outer_right = max(self.right, other.right)
         outer_bottom = min(self.bottom, other.bottom)
@@ -116,6 +115,9 @@ class Rect:
 
 
     def overlaps(self, other) -> bool:
+        """
+        Returns wether two Rects overlap
+        """
         if self.right <= other.left or other.right <= self.left:
             return False
         if self.top <= other.bottom or other.top <= self.bottom:

@@ -1,19 +1,28 @@
 from copy import deepcopy
+from mimetypes import init
+import matplotlib.pyplot as plt
+import cProfile
+
 from Point import Point, PointType
 from Rect import Rect
 from Configuration1 import Configuration
 from plotting import draw_configuration
-import matplotlib.pyplot as plt
+
 import TestCases 
 
-import cProfile
-
+# The amount to look in each direction when determining if a corner is concave
 eps = 0.001
 
 
 frame_time = 0.02
 test_set = deepcopy(TestCases.cat1_p3)
 
+# class BinPacker:
+
+#     def __init__(self, all_rects: list, container_size: Point, plot_process:bool = False) -> None:
+#         self.all_rects = all_rects
+#         self.size = container_size
+    
 
 def plot(C: Configuration, rects: list = [], waittime: float = 0.0):
     """
@@ -106,9 +115,9 @@ def check_boundaries(C: Configuration, p: Point):
     ]
 
 
+# TODO: Make faster, gets called A LOT - cache some results
 def A0(C: Configuration, L: list[Rect], rects: list[Rect]):
-    
-    while 0 < len(L):
+    while L:
 
         degrees = [degree(ccoa, C) for ccoa in L]
         best = argmax(degrees)
@@ -148,7 +157,7 @@ def A1(container_size: Point, rects: list[Rect]):
     C = Configuration(size=container_size, max_rects=len(rects))
     L = generate_L(C, rects)
 
-    while 0 < len(L):
+    while L:
         max_benefit = 0
         max_benefit_ccoa = None
 
@@ -178,7 +187,7 @@ if __name__ == "__main__":
     size = Point(20,20)
 
     C = Configuration(size=size, max_rects=TestCases.cat1_p3)
-    plot(C, waittime=4)
+    plot(C, waittime=1)
 
     # cProfile.run('C = A1(container_size = size, rects = tests.cat1_p1)', sort="time")
     C = A1(container_size = size, rects = TestCases.cat1_p3)
