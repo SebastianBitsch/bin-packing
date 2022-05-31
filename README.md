@@ -7,9 +7,9 @@ The rectangles are placed into the container one by one and each rectangle is pa
 The algorithm is implemented in python using matplotlib for visualization where the running time has been slowed for the sake of recording.
 
 **Sources**  
-https://doi.org/10.1016/j.cie.2007.04...
-https://doi.org/10.1016/S0377-2217(99...
-https://en.wikipedia.org/wiki/Bin_pac...
+https://www.sciencedirect.com/science/article/abs/pii/S0360835207000678?via%3Dihub
+https://www.sciencedirect.com/science/article/abs/pii/S0377221799003574?via%3Dihub
+https://en.wikipedia.org/wiki/Bin_packing_problem
 
 **Demo**  
 ![Skærmoptagelse-2022-06-01-kl -01 40 50](https://user-images.githubusercontent.com/72623007/171301493-75ba9711-9515-48f2-bae2-872a45a6aae2.gif)
