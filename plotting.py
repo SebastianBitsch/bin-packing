@@ -25,7 +25,7 @@ def draw_configuration(C: Configuration, all_rects: list, unplaced_rects: list, 
     axs[1].set_yticks([])
 
     # Draw the rects in main plot
-    for rect in C.rects:
+    for rect in C.packed_rects:
         draw_rect(axs[0], rect, background_color, edge_color, alpha)
 
     draw_points(axs[0], corners)
