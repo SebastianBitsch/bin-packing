@@ -100,7 +100,6 @@ def draw_rects_overview(ax, all_rects: list, unplaced_rects: list):
 
     for w,h in all_rects:
         unplaced: bool = ((w,h) or (h,w)) in unplaced_rects
-        print((w,h),unplaced)
         color = unplaced_rect_color if unplaced else placed_rect_color
         tallest = max(tallest, h)
         
