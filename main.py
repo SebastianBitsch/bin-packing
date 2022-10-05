@@ -9,7 +9,7 @@ from util import plot_configuration, initialize_plot
 if __name__ == "__main__":
 
     # Parameters
-    rects = TestCases.cat1_p1
+    rects = [(10,10),(5,5),(5,5),(10,20)]#TestCases.cat1_p2
     plotting = False
     container_size = (20,20)
 
@@ -18,8 +18,8 @@ if __name__ == "__main__":
     packer = BinPacker(C)
 
     # For profiling     
-    cProfile.run('C = packer.A1(C)', sort="time")
-    # C = packer.A1(C)
+    # cProfile.run('C = packer.PackConfiguration(C)', sort="time")
+    C = packer.PackConfiguration(C)
 
     # Show final configuration
     if not plotting:

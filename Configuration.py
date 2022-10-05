@@ -147,10 +147,12 @@ class Configuration:
 
         return occupied_area/total_area
 
+
     def get_all_corners(self) -> list[tuple]:
         """
         Returns a set of all unique points in the container
         """
+
         # The container corners
         corners = [(0,0), (0,self.size[1]), (self.size[0],0), self.size]
 
@@ -158,6 +160,7 @@ class Configuration:
         for rect in self.packed_rects:
             corners += [rect.corner_bot_l, rect.corner_bot_r, rect.corner_top_l, rect.corner_top_r]
         return list(set(corners))
+
 
     def is_successful(self) -> bool:
         return len(self.unpacked_rects) == 0
