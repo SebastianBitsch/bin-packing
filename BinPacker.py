@@ -48,7 +48,8 @@ class BinPacker:
             return Cx.density()
 
 
-    def A1(self, C: Configuration):
+    def PackConfiguration(self, C: Configuration):
+        """ The method called A1 in the paper """
 
         while C.L:
             max_benefit = 0
