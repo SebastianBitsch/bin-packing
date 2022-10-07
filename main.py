@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     # Parameters
     rects = TestCases.cat1_p1
-    plotting = False
+    plotting = True
     container_size = (20,20)
 
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     # Show final configuration
     if not plotting:
-        initialize_plot(C, rects)
+        initialize_plot(C, rects, 5)
         plot_configuration(C, last_frame=True)
     
 

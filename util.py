@@ -30,7 +30,7 @@ max_width = 0
 def argmax(lst):
     return lst.index(max(lst))
 
-def initialize_plot(C, rects = None, frame_time: float = 0.02, start_time: float = 2, end_time: float = 20, fig_size = (12,6)):
+def initialize_plot(C, rects = None, frame_time: float = 0.02, start_time: float = 4, end_time: float = 20, fig_size = (12,6)):
     global frametime, starttime, endtime
     global figsize, max_width
     global all_rects
