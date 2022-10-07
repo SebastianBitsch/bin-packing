@@ -1,3 +1,4 @@
+from enum import auto
 from Node import Node, Rect
 
 
@@ -32,7 +33,21 @@ class Packer():
         return filled_area / float(total_area)
 
 
-    def fit(self):
+    def fit(self, rects:list[Rect], auto_bounds:bool=False) -> None:
+        successful_fit = False
+        self.rects = rects
+
+        while True:
+            self.rects = self._fit(rects)
+            successful_fit = (0 == self.n_outside_bounds())
+
+            if successful_fit or not auto_bounds:
+                return self.rects
+            else:
+                self.increment_size()
+
+
+    def _fit(self, rects:list[Rect]) -> list[Rect]:
         ...
 
 
@@ -54,24 +69,22 @@ class Packer():
 
 class SimplePacker(Packer):
 
-    def fit(self, rects:list[Rect]) -> None:
-
+    def _fit(self, rects:list[Rect]) -> list[Rect]:
         for rect in rects:
             node = self.find_node(self.root, rect.w, rect.h)
             if node:
                 rect.fit = self.split_node(node, rect.w, rect.h)
+                rect.inbounds = True
             else:
                 rect.inbounds = False
 
-        self.rects = rects
         return rects
 
 
 
 class AdvancedPacker(Packer):
 
-    def fit(self, rects:list[Rect], auto_bounds:bool=False) -> None:
-
+    def _fit(self, rects:list[Rect]) -> list[Rect]:
         for rect in rects:
             node = self.find_node(self.root, rect.w, rect.h)
             if node:
@@ -82,8 +95,7 @@ class AdvancedPacker(Packer):
             # Set inbound variable for each rect
             rect.inbounds = False if self.root.x+self.bounds[0] <= rect.fit.x or self.root.y+self.bounds[1] <= rect.fit.y else True
 
-        self.rects = rects
-        return self.rects
+        return rects
 
 
     def grow_node(self, w:int, h:int):

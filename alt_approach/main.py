@@ -59,7 +59,7 @@ if __name__ == "__main__":
     p = SimplePacker(*size)
     # p = AdvancedPacker(*size)
     
-    rects = p.fit(rects)
+    rects = p.fit(rects, auto_bounds=True)
 
     plot(rects, size)
 
