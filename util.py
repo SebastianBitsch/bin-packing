@@ -43,11 +43,9 @@ def initialize_plot(C, rects = None, frame_time: float = 0.02, start_time: float
     # Used for showing custom rects when late initializing plot
     if rects == None:
         all_rects = copy(C.unpacked_rects)
-        max_width = len(C.unpacked_rects) * 2.2 #TODO: Find better way of doing this
     else:
         all_rects = rects
-        max_width = len(rects) * 2.2 #TODO: Find better way of doing this
-
+    max_width = sum([r[0] for r in rects]) + 1 + len(rects)#TODO: Find better way of doing this
 
 
 def plot_configuration(C, last_frame: bool):
@@ -101,7 +99,7 @@ def draw_rects_overview(ax, all_rects: list, unplaced_rects: list):
     current_pos = (1,1)
 
     for w,h in all_rects:
-        unplaced: bool = (w,h) in unplaced_rects
+        unplaced: bool = ((w,h) or (h,w)) in unplaced_rects
         color = unplaced_rect_color if unplaced else placed_rect_color
         tallest = max(tallest, h)
         

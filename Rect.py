@@ -4,7 +4,29 @@ from util import PointType
 
 class Rect:
 
-    def __init__(self, origin: tuple, width, height, origin_type: PointType = PointType.BOTTOM_LEFT, rotated:bool = False) -> None:        
+    def __init__(self, origin: tuple, width:float, height:float, origin_type: PointType = PointType.BOTTOM_LEFT, rotated:bool = False) -> None:
+        """
+        A container class and data structure for a rect representing a box to be packed. 
+        Main functionality consists of wrapping and data and checking if rects overlap contain points etc.
+
+        Parameters
+        ----------
+        origin, tuple
+            a tuple of (x,y) coordinates containing the ogigin point of the box. Can be either of corners depending on the case
+
+        width, float
+            the width of the rect
+
+        height, float
+            the height of the rect
+
+        origin_type, PointType
+            an enum value determining which of the four corners is the origin point
+
+        rotated, bool
+            boolean value indicating whether the rect is rotated
+        """        
+
         assert(0 < width and 0 < height)
 
         if rotated:
@@ -59,6 +81,7 @@ class Rect:
 
 
     def contains(self, point: tuple) -> bool:
+        """ Return whether the rect contains a given point (x,y) """
         return self.corner_bot_l[0] <= point[0] and self.corner_bot_l[1] <= point[1] and point[0] <= self.corner_top_r[0] and point[1] <= self.corner_top_r[1]
 
 

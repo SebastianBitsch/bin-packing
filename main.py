@@ -18,8 +18,8 @@ if __name__ == "__main__":
     packer = BinPacker(C)
 
     # For profiling     
-    cProfile.run('C = packer.A1(C)', sort="time")
-    # C = packer.A1(C)
+    # cProfile.run('C = packer.PackConfiguration(C)', sort="time")
+    C = packer.PackConfiguration(C)
 
     # Show final configuration
     if not plotting:
