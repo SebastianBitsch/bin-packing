@@ -6,7 +6,7 @@ from Packers import SimplePacker, AdvancedPacker
 from Node import Rect
 
 
-sort_types = {"width":0, "height":1, "max":2, "area":3, "w":0, "h":0, "a":3}    
+sort_types = {"width":0, "height":1, "max":2, "area":3}    
 
 def sort(rects:list[tuple], sort_attr:str='width') -> list[tuple]:
     """ Function for sorting a list of rects using a given sorting method """
@@ -26,12 +26,12 @@ def sort(rects:list[tuple], sort_attr:str='width') -> list[tuple]:
     return [x[:2] for x in attr]
 
 
-def plot(rects:list[Rect], size: tuple, figsize:tuple=(7,7)) -> None:
+def plot(rects:list[Rect], figsize:tuple=(7,7)) -> None:
     """ Plot a collection of rects """
     _, ax = plt.subplots(figsize=figsize)
 
-    ax.set_xlim([0,size[0]])
-    ax.set_ylim([0,size[1]])
+    ax.set_xlim([0,rects[0].fit.w])
+    ax.set_ylim([0,rects[0].fit.h])
     plt.locator_params(axis="both", integer=True, tight=True)
 
     for r in rects:
@@ -50,16 +50,15 @@ def draw_rect(ax, rect: Rect) -> None:
 
 if __name__ == "__main__":
     
-    dims = all_cases[0]
+    dims = all_cases[2]
     size = (20, 20)
 
     dims = sort(dims, sort_attr="max")
     rects = [Rect(d) for d in dims]
 
-    p = SimplePacker(*size)
-    # p = AdvancedPacker(*size)
+    #p = SimplePacker(*size)
+    p = AdvancedPacker(*size)
     
     rects = p.fit(rects, auto_bounds=True)
-
-    plot(rects, size)
+    plot(rects)
 

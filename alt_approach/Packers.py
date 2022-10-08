@@ -1,4 +1,3 @@
-from enum import auto
 from Node import Node, Rect
 
 
@@ -33,12 +32,17 @@ class Packer():
         return filled_area / float(total_area)
 
 
-    def fit(self, rects:list[Rect], auto_bounds:bool=False) -> None:
+    def fit(self, rects:list[Rect], auto_bounds:bool=False) -> list[Rect]:
+        """ 
+        Fit the given rects into the bounds. if auto bounds is set to true the bounds will
+        expand everytime the fit is unsuccessful in packing all rects
+        """
         successful_fit = False
         self.rects = rects
 
         while True:
             self.rects = self._fit(rects)
+            
             successful_fit = (0 == self.n_outside_bounds())
 
             if successful_fit or not auto_bounds:
@@ -67,6 +71,7 @@ class Packer():
         return node
 
 
+
 class SimplePacker(Packer):
 
     def _fit(self, rects:list[Rect]) -> list[Rect]:
@@ -74,7 +79,10 @@ class SimplePacker(Packer):
             node = self.find_node(self.root, rect.w, rect.h)
             if node:
                 rect.fit = self.split_node(node, rect.w, rect.h)
-                rect.inbounds = True
+        
+            # Set inbound variable for each rect
+            if rect.fit:
+                rect.inbounds = False if self.root.x+self.bounds[0] < rect.fit.x or self.root.y+self.bounds[1] < rect.fit.y else True
             else:
                 rect.inbounds = False
 
@@ -91,7 +99,7 @@ class AdvancedPacker(Packer):
                 rect.fit = self.split_node(node, rect.w, rect.h)
             else:
                 rect.fit = self.grow_node(rect.w, rect.h)
-
+            
             # Set inbound variable for each rect
             rect.inbounds = False if self.root.x+self.bounds[0] <= rect.fit.x or self.root.y+self.bounds[1] <= rect.fit.y else True
 
@@ -124,12 +132,8 @@ class AdvancedPacker(Packer):
         new_root.right = self.root
 
         self.root = new_root
+        return self.next(w,h)
 
-        node = self.find_node(self.root, w, h)
-        if node:
-            return self.split_node(node, w, h)
-        else:
-            return None
 
     def grow_right(self, w:int, h:int):
         new_root = Node((0,0), (self.root.w + w, self.root.h))
@@ -138,7 +142,10 @@ class AdvancedPacker(Packer):
         new_root.right = Node((self.root.w, 0), (w, self.root.h))
 
         self.root = new_root
+        return self.next(w,h)
 
+
+    def next(self, w, h):
         node = self.find_node(self.root, w, h)
         if node:
             return self.split_node(node, w, h)
